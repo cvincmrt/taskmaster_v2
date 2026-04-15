@@ -16,12 +16,18 @@ class Database
 
     public function getConnection() :?PDO
     {
+        if($this->conn !== null){
+            return $this->conn;
+        }
+
         $dns = "mysql:host={$this->host};dbname={$this->dbname};charset={$this->charset}";
+
         try{
             $this->conn = new PDO($dns, $this->user, $this->password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch(PDOException $e){
-            die($e->getMessage());                
+            die("Connection error: ".$e->getMessage());                
         }
 
         return $this->conn;

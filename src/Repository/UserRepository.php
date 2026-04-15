@@ -1,9 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Repository;
 
 use PDO;
 use PDOException;
+use App\Models\User;
 
 class UserRepository
 {
@@ -46,9 +47,8 @@ class UserRepository
             return null;
         }
 
-        $user = new User($row["username"], "", $row["role"]);
+        $user = new User($row["username"], $row["password"], $row["role"], true);
         $user->setId((int)$row["id"]);
-        $user->setRawPassword($row["password"]); 
         return $user;
    }
 }

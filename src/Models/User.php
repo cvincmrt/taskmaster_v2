@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 class User
 {
@@ -9,11 +9,16 @@ class User
     private string $password;
     private string $role; // admin,manager,worker default worker
 
-    public function __construct(string $username,string $password, string $role = "worker")
+    public function __construct(string $username,string $password, string $role = "worker", bool $isAlreadyHashed = false)
     {
         $this->username = $username;
-        $this->password = password_hash($password, PASSWORD_DEFAULT);
         $this->role = $role;
+        
+        if($isAlreadyHashed){
+            $this->password = $password;
+        }else{
+            $this->password = password_hash($password, PASSWORD_DEFAULT);
+        }
     }
      
     // getters *****************************
@@ -38,11 +43,6 @@ class User
     public function setId(int $id) :void
     {
         $this->id = $id;
-    }
-
-    public function setRawPassword(string $passwordHash) :void
-    {
-        $this->password = $passwordHash;
     }
 
     //verify method ***********************

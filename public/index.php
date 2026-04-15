@@ -1,29 +1,31 @@
 <?php
 
-require_once __DIR__."/../init.php";
+session_start();
 
-use App\User;
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use App\Database;
-use App\UserRepository;
+use App\Models\User;
+use App\Repository\UserRepository;
 
 $connection = new Database();
 $pdo = $connection->getConnection();
 
 $userRepo = new UserRepository($pdo);
-/*$user = new User("martin","martin", "admin");
 
-if($userRepo->save($user)){
-    echo "user has been saved";
-}else{
-    echo "user not saved";
-}*/
+$user = $userRepo->findByUsername("peter");
 
-if($user = $userRepo->findByUsername("peter")){
-    echo "user find";
-    var_dump($user);
-
-}else{
-    echo "user not find";
+if ($user) {
+    echo "Užívateľ nájdený: " . $user->getUsername() . " (Rola: " . $user->getRole() . ")<br>";
+    
+    // 2. Overíme heslo (toto je ten hlavný test!)
+    if ($user->passwordVerify("martin")) {
+        echo "Heslo je správne. Vitaj!";
+    } else {
+        echo "Nesprávne heslo.";
+    }
+} else {
+    echo "Užívateľ neexistuje.";
 }
 
 
