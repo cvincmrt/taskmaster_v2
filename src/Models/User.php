@@ -13,12 +13,7 @@ class User
     {
         $this->username = $username;
         $this->role = $role;
-        
-        if($isAlreadyHashed){
-            $this->password = $password;
-        }else{
-            $this->password = password_hash($password, PASSWORD_DEFAULT);
-        }
+        $this->password = $isAlreadyHashed ? $password : password_hash($password, PASSWORD_DEFAULT);
     }
      
     // getters *****************************
