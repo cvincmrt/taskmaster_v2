@@ -66,8 +66,6 @@ abstract class Task
         return $this->priority;
     }
 
-
-
     //setters
 
     public function setId(int $id) :void

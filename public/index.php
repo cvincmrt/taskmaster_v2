@@ -7,11 +7,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Database;
 use App\Models\User;
 use App\Repository\UserRepository;
+use App\Repository\TaskRepository;
 
 $connection = new Database();
 $pdo = $connection->getConnection();
 
 $userRepo = new UserRepository($pdo);
+$taskRepo = new TaskRepository($pdo);
 /*
 
 $user = new User("peter","peter");
