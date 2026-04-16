@@ -13,7 +13,7 @@ $pdo = $connection->getConnection();
 
 $userRepo = new UserRepository($pdo);
 
-$user = $userRepo->findByUsername("peter");
+$user = $userRepo->findByUsername("martin");
 
 if ($user) {
     echo "Užívateľ nájdený: " . $user->getUsername() . " (Rola: " . $user->getRole() . ")<br>";
