@@ -24,3 +24,4 @@ $taskRepo = new TaskRepository($pdo);
 $projectRepo = new ProjectRepository($pdo);
 
 
+var_dump($taskRepo->findAll());
