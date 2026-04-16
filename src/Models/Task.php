@@ -15,7 +15,7 @@ abstract class Task
     protected string $colorTask;
 
 
-    public function __construct(int $creatorId, ?int $assignedTo, int $projectId, string $title, string $status = "todo", string $type, int $priority = 1, ?int $id = null)
+    public function __construct(int $creatorId, int $projectId, string $title, string $type, int $priority = 1, ?int $id = null, ?int $assignedTo = null, string $status = "todo")
     {
         $this->id = $id;
         $this->creatorId = $creatorId;
@@ -46,6 +46,11 @@ abstract class Task
         return $this->assignedTo;
     }
 
+    public function getProjectId() :int
+    {
+        return $this->projectId;
+    }
+
     public function getTitle() :string
     {
         return $this->title;
@@ -64,6 +69,11 @@ abstract class Task
      public function getPriority() :int
     {
         return $this->priority;
+    }
+
+    public function getColorTask() :string
+    {
+        return (basename(get_class($this)) === "BugTask") ? "bg-danger" : "bg-primary";
     }
 
     //setters

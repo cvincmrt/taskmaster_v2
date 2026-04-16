@@ -8,7 +8,7 @@ use App\Models\User;
 
 class UserRepository
 {
-    private ?PDO $db = null;
+    private PDO $db;
 
     public function __construct(PDO $pdo)
     {
