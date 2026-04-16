@@ -57,13 +57,15 @@ class TaskRepository
 
                 $task = null;
 
+                $assignedTo = $row["assigned_to"] !== null ? (int)$row["assigned_to"] : null;
+
                 switch($row["type"]){
                     case "bug":
-                        $task = new BugTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $row["assigned_to"], $row["status"]);
+                        $task = new BugTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $assignedTo, $row["status"]);
                         break; 
                     
                     case "feature":
-                        $task = new FeatureTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $row["assigned_to"], $row["status"]);
+                        $task = new FeatureTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $assignedTo, $row["status"]);
                         break;
                 } 
                 
