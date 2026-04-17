@@ -45,6 +45,30 @@ class TaskRepository
         }
     }
 
+    private function mapToEntity(array $row) :?Task
+    {
+        $task = null;
+
+        $assignedTo = $row["assigned_to"] !== null ? (int)$row["assigned_to"] : null;
+
+        switch($row["type"]){
+            case "bug":
+                $task = new BugTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $assignedTo, $row["status"]);
+                break; 
+                        
+            case "feature":
+                $task = new FeatureTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $assignedTo, $row["status"]);
+                break;
+        } 
+                    
+        if($task){
+            $task->setCreatedAt($row["created_at"]);
+            $task->setAssignedAt($row["assigned_at"]);
+            $task->setFinishedAt($row["finished_at"]);
+        }
+        return $task;
+    }
+
     public function findAll() :array
     {
         try{
@@ -55,34 +79,37 @@ class TaskRepository
 
             while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
 
-                $task = null;
-
-                $assignedTo = $row["assigned_to"] !== null ? (int)$row["assigned_to"] : null;
-
-                switch($row["type"]){
-                    case "bug":
-                        $task = new BugTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $assignedTo, $row["status"]);
-                        break; 
-                    
-                    case "feature":
-                        $task = new FeatureTask((int)$row["creator_id"], (int)$row["project_id"], $row["title"], (int)$row["priority"], (int)$row["id"], $assignedTo, $row["status"]);
-                        break;
-                } 
+                $task = $this->mapToEntity($row);
                 
                 if($task){
-                    $task->setCreatedAt($row["created_at"]);
-                    $task->setAssignedAt($row["assigned_at"]);
-                    $task->setFinishedAt($row["finished_at"]);
-
                     $tasks[] = $task;
                 }
-                
             }
             return $tasks;
         }
         catch(PDOException $e){
         return [];
         }
+    }
+
+    public function find(int $id)
+    {
+        try{
+            $sql = "SELECT * FROM tasks WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+
+            $stmt->execute([
+                ":id" => $id
+            ]);
+
+            if($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                   return $this->mapToEntity($row);
+            }
+        }
+        catch(PDOException $e){
+            return null;
+        }
+        
     }
    
     
