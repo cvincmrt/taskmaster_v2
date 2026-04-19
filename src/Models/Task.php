@@ -109,6 +109,15 @@ abstract class Task
         $this->createdAt = $date;
     }
 
+    public function setAssignedTo(?int $userId) :void
+    {
+        if($this->assignedTo !== $userId){
+            $this->assignedTo = $userId;
+            
+            $this->assignedAt = ($userId !== null) ? date("Y-m-d H:i:s") : null;        
+        }     
+    }
+
     public function setAssignedAt(?string $date) :void
     {
         $this->assignedAt = $date;
