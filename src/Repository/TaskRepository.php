@@ -7,26 +7,18 @@ use App\Models\BugTask;
 use App\Models\FeatureTask;
 use PDO;
 use PDOException;
+use PDOStatement;
 
-class TaskRepository
+class TaskRepository extends BaseRepository
 {
-    private PDO $db;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->db = $pdo;
-    }
-
-
+   
     public function save(Task $task) :bool
     {
         if($task->getId() === null){
-            try{
+    
                 $sql = "INSERT INTO tasks (creator_id, assigned_to, project_id, title, status, type, priority) VALUES (:creator_id, :assigned_to, :project_id, :title, :status, :type, :priority)";
 
-                $stmt = $this->db->prepare($sql);
-
-                $result = $stmt->execute([
+                $params = [
                     ":creator_id" => $task->getCreatorId(),
                     ":assigned_to" => $task->getAssignedTo(),
                     ":project_id" => $task->getProjectId(),
@@ -34,25 +26,22 @@ class TaskRepository
                     ":status" => $task->getStatus(),
                     ":type" => $task->getType(),
                     ":priority" => $task->getPriority()
-                ]);
+                ];
 
-                if($result && $task->getId() === null){
+                $stmt = $this->query($sql, $params);
+                
+                if($stmt instanceof PDOStatement){
                     $task->setId((int)$this->db->lastInsertId());
+                    return true;
                 }
-
-                return $result;
-            }
-            catch(PDOException $e){
-                return false;
-            }
+               
+                return false;         
             
         }else{
-            try{
+      
                 $sql = "UPDATE tasks SET assigned_to = :assigned_to,  title = :title, status = :status, priority = :priority, finished_at = :finished_at, assigned_at = :assigned_at  WHERE id = :id";
 
-                $stmt = $this->db->prepare($sql);
-
-                return $stmt->execute([
+                $params = [
                     ":id" => $task->getId(),
                     ":title" => $task->getTitle(),
                     ":status" => $task->getStatus(),
@@ -60,63 +49,53 @@ class TaskRepository
                     ":finished_at" => $task->getFinishedAt(),
                     ":assigned_to" => $task->getAssignedTo(), 
                     ":assigned_at" => $task->getAssignedAt()
-                ]);
-            }
-            catch(PDOException $e){
-                return false;
-            }            
+                ];
+
+                return (bool)$this->query($sql, $params);
         }     
     }
 
     public function findAll() :array
     {
-        try{
-            $tasks = [];    
-            
+   
             $sql = "SELECT * FROM tasks";
-            $stmt = $this->db->query($sql);
+            $stmt = $this->query($sql);
 
-            while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $tasks = [];
 
-                $task = $this->mapToEntity($row);
-                
-                if($task){
-                    $tasks[] = $task;
+            if($stmt instanceof PDOStatement){
+                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+
+                    $task = $this->mapToEntity($row);
+                    
+                    if($task){
+                        $tasks[] = $task;
+                    }
                 }
             }
             return $tasks;
-        }
-        catch(PDOException $e){
-        return [];
-        }
+        
     }
 
     public function find(int $id) :?Task
     {
-        try{
+        
             $sql = "SELECT * FROM tasks WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
 
-            $stmt->execute([
-                ":id" => $id
-            ]);
+            $stmt = $this->query($sql, [":id" => $id]);
 
-            if($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            if($stmt instanceof PDOStatement && $row = $stmt->fetch(PDO::FETCH_ASSOC)){
                    return $this->mapToEntity($row);
             }
-        }
-        catch(PDOException $e){
+    
             return null;
-        }   
-        
-        return null;
     }
 
     private function mapToEntity(array $row) :?Task
     {
         $task = null;
 
-        $assignedTo = $row["assigned_to"] !== null ? (int)$row["assigned_to"] : null;
+        $assignedTo = ($row["assigned_to"] !== null) ? (int)$row["assigned_to"] : null;
 
         switch($row["type"]){
             case "bug":
@@ -139,18 +118,8 @@ class TaskRepository
 
     public function delete(int $id) :bool
     {
-        try{
-            $sql = "DELETE FROM tasks WHERE id = :id";
+        $sql = "DELETE FROM tasks WHERE id = :id";
 
-            $stmt = $this->db->prepare($sql);
-
-            return $stmt->execute([
-                ":id" => $id
-            ]);
-        }
-        catch(PDOException $e){
-            return false;
-
-        }
+        return (bool)$stmt = $this->query($sql, [":id" => $id]);
     }
 }

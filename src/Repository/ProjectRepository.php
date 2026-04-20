@@ -5,15 +5,8 @@ namespace App\Repository;
 use PDO;
 use App\Models\Project;
 
-class ProjectRepository
+class ProjectRepository extends BaseRepository
 {
-    private PDO $db;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->db = $pdo;
-    }
-
     public function save(Project $project) :bool
     {
         $sql = "INSERT INTO projects (owner_id, title, description) VALUES (:owner_id, :title, :description)";
